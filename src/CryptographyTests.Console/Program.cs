@@ -19,7 +19,10 @@ public static class Program
 
 
         //TestRsaAsymmetricEncryption();
-        TestRsaAsymmetricEncryptionWithEncrpytedPrivateKey();
+        //TestRsaAsymmetricEncryptionWithEncrpytedPrivateKey();
+
+        TestRsaDigitalSignature();
+
         Console.WriteLine("Press any key to close...");
         Console.ReadLine();
 
@@ -232,6 +235,49 @@ public static class Program
         Console.WriteLine($"Encrypted CipherText: {encrypted.ChipherText}  ({encrypted.ChipherTextBytes.Length} bytes length)");
         Console.WriteLine($"Decrypted: {decrypted.PlainText}  ({decrypted.PlainTextInBytes.Length} bytes length)");
         Console.WriteLine("**");
+    }
+
+    private static void TestRsaDigitalSignature()
+    {
+        var toBeSigned = "Here is some really large large and large text to play around";
+
+        var keyPair = RsaDigitalSignature.CreateKeyPair(4096);
+        var signed = RsaDigitalSignature.Sign(toBeSigned, keyPair.PrivateKeyBytes);
+        var verify = RsaDigitalSignature.Verify(signed.SignatureBytes, keyPair.PublicKeyBytes, signed.HashBytes);
+
+        Console.WriteLine("**");
+        Console.WriteLine("RSA DigitalSignature");
+        Console.WriteLine($"Text: {toBeSigned}");
+        Console.WriteLine($"Public Key: {keyPair.PublicKeyString}  ({keyPair.PublicKeyBytes.Length} bytes length)");
+        Console.WriteLine($"Private Key: {keyPair.PrivateKeyString}  ({keyPair.PrivateKeyBytes.Length} bytes length)");
+        Console.WriteLine($"Signature: {signed.SignatureText}  ({signed.SignatureBytes.Length} bytes length)");
+        Console.WriteLine($"Signature Hash: {signed.HashText}  ({signed.HashBytes.Length} bytes length)");
+        Console.WriteLine($"Verify: {verify.IsValid}");
+        Console.WriteLine("**");
+    }
+
+
+    static void TestAll()
+    {
+        GenerateAndPrintRandomKey();
+
+        TestCoreHashingFunctions();
+        TestHmacHashingFunctions();
+        TestPasswordHashingTechnique();
+
+        TestDesSymmetricEncryption();
+        TestTripleDesSymmetricEncryption();
+        TestAesSymmetricEncryption();
+        TestAesGcmSymmetricEncryption();
+
+
+        TestRsaAsymmetricEncryption();
+        TestRsaAsymmetricEncryptionWithEncrpytedPrivateKey();
+
+        TestRsaDigitalSignature();
+        Console.WriteLine("Press any key to close...");
+        Console.ReadLine();
+
     }
 }
 
