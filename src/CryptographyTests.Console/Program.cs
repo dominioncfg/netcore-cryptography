@@ -15,8 +15,11 @@ public static class Program
         //TestDesSymmetricEncryption();
         //TestTripleDesSymmetricEncryption();
         //TestAesSymmetricEncryption();
-        TestAesGcmSymmetricEncryption();
+        //TestAesGcmSymmetricEncryption();
 
+
+        //TestRsaAsymmetricEncryption();
+        TestRsaAsymmetricEncryptionWithEncrpytedPrivateKey();
         Console.WriteLine("Press any key to close...");
         Console.ReadLine();
 
@@ -180,7 +183,7 @@ public static class Program
         var decrypted = AesGcmSymmetricEncryption.Decrypt(encrypted.CipherTextString, key.Bytes, nonce.Bytes, encrypted.TagBytes, associatedData.Bytes);
 
         Console.WriteLine("**");
-        Console.WriteLine("Aes CBC Encryption");
+        Console.WriteLine("Aes GCM Encryption");
         Console.WriteLine($"Text: {toBeEncrypted}");
         Console.WriteLine($"Key: {key.String}  ({key.Bytes.Length} bytes length)");
         Console.WriteLine($"Nonce: {nonce.String}  ({nonce.Bytes.Length} bytes length)");
@@ -188,6 +191,46 @@ public static class Program
         Console.WriteLine($"Encrypted Tag: {encrypted.TagString}  ({encrypted.TagBytes.Length} bytes length)");
         Console.WriteLine($"Associated Data: {associatedData.String}  ({associatedData.Bytes.Length} bytes length)");
         Console.WriteLine($"Decrypted: {decrypted.PlainText}  ({decrypted.PlainText.Length} bytes length)");
+        Console.WriteLine("**");
+    }
+
+
+    private static void TestRsaAsymmetricEncryption()
+    {
+        var toBeEncrypted = "Here is some really large large and large text to play around";
+
+        var keyPair = RsaAsymmetricEncryption.CreateKeyPair(2048);
+        var encrypted = RsaAsymmetricEncryption.Encrypt(toBeEncrypted, keyPair.PublicKeyBytes);
+        var decrypted = RsaAsymmetricEncryption.Decrypt(encrypted.ChipherText, keyPair.PrivateKeyBytes);
+
+        Console.WriteLine("**");
+        Console.WriteLine("RSA Encryption");
+        Console.WriteLine($"Text: {toBeEncrypted}");
+        Console.WriteLine($"Public Key: {keyPair.PublicKeyString}  ({keyPair.PublicKeyBytes.Length} bytes length)");
+        Console.WriteLine($"Private Key: {keyPair.PrivateKeyString}  ({keyPair.PrivateKeyBytes.Length} bytes length)");
+        Console.WriteLine($"Encrypted CipherText: {encrypted.ChipherText}  ({encrypted.ChipherTextBytes.Length} bytes length)");
+        Console.WriteLine($"Decrypted: {decrypted.PlainText}  ({decrypted.PlainTextInBytes.Length} bytes length)");
+        Console.WriteLine("**");
+    }
+
+    private static void TestRsaAsymmetricEncryptionWithEncrpytedPrivateKey()
+    {
+        var toBeEncrypted = "Here is some really large large and large text to play around";
+
+        // A random password to encrypt the private key
+        var password = CryptographicKey.CreateRandomOfBytes(32);
+
+        var keyPair = RsaWithEncryptedKeysAsymmetricEncryption.CreateKeyPair(4096, password.String);
+        var encrypted = RsaWithEncryptedKeysAsymmetricEncryption.Encrypt(toBeEncrypted, keyPair.PublicKeyBytes);
+        var decrypted = RsaWithEncryptedKeysAsymmetricEncryption.DecryptWithEncryptedPrivateKey(encrypted.ChipherText, keyPair.PrivateKeyBytes, password.String);
+
+        Console.WriteLine("**");
+        Console.WriteLine("RSA Encryption");
+        Console.WriteLine($"Text: {toBeEncrypted}");
+        Console.WriteLine($"Public Key: {keyPair.PublicKeyString}  ({keyPair.PublicKeyBytes.Length} bytes length)");
+        Console.WriteLine($"Private Key: {keyPair.PrivateKeyString}  ({keyPair.PrivateKeyBytes.Length} bytes length)");
+        Console.WriteLine($"Encrypted CipherText: {encrypted.ChipherText}  ({encrypted.ChipherTextBytes.Length} bytes length)");
+        Console.WriteLine($"Decrypted: {decrypted.PlainText}  ({decrypted.PlainTextInBytes.Length} bytes length)");
         Console.WriteLine("**");
     }
 }
