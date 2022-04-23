@@ -21,7 +21,11 @@ public static class Program
         //TestRsaAsymmetricEncryption();
         //TestRsaAsymmetricEncryptionWithEncrpytedPrivateKey();
 
-        TestRsaDigitalSignature();
+        //TestRsaDigitalSignature();
+
+        //TestHybridEncryption();
+
+        TestAll();
 
         Console.WriteLine("Press any key to close...");
         Console.ReadLine();
@@ -257,6 +261,28 @@ public static class Program
     }
 
 
+    static void TestHybridEncryption()
+    {
+        var clientAddress = "Client";
+        var serverAddress = "ServerAddress";
+
+        var network = new ComputersNetworkSimulator();
+
+        var client = new ClientComputer(clientAddress);
+        var server = new ServerComputer(serverAddress);
+
+        network.Register(client);
+        network.Register(new TrustedComputer("TC1"));
+        network.Register(server);
+
+        var response = client.SendEncryptedRequestToServer(serverAddress, new SumRequestPayload()
+        {
+            A = 2,
+            B = 3,
+        });
+        Console.WriteLine($"The server response {response}");
+    }
+
     static void TestAll()
     {
         GenerateAndPrintRandomKey();
@@ -275,9 +301,10 @@ public static class Program
         TestRsaAsymmetricEncryptionWithEncrpytedPrivateKey();
 
         TestRsaDigitalSignature();
+
+        TestHybridEncryption();
         Console.WriteLine("Press any key to close...");
         Console.ReadLine();
-
     }
 }
 
