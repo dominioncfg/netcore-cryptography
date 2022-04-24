@@ -115,6 +115,11 @@ public static class Program
         var classicHash = PasswordHasher.ClassicHashPasswordWithSalt(passwordToBeHashed, salt);
         Console.WriteLine($"Classic Password Hashed with Manually: {classicHash.String} ({classicHash.Bytes.Length} bytes length)");
         Console.WriteLine("**");
+
+        Console.WriteLine("**");
+        var argonPassHash = Argon2idPasswordHasher.ComputeHashPassword(passwordToBeHashed, salt, 2);
+        Console.WriteLine($"Argon2id Password hashed: {argonPassHash.String} ({argonPassHash.Bytes.Length} bytes length)");
+        Console.WriteLine("**");
     }
 
     private static void TestDesSymmetricEncryption()

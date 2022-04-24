@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using Konscious.Security.Cryptography;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace CryptographyTests.Core;
@@ -18,7 +19,7 @@ public static class PasswordHasher
     // * Goood Default for number of iteration is >= 100000.
     // * Is really slow but this is a good point in this case.
 
-    public static PasswordHashResult ComputeHashPasswordUsingKeyDerivationFunction(string passwordToBeHashed, byte[] salt, int numberOfIterations) 
+    public static PasswordHashResult ComputeHashPasswordUsingKeyDerivationFunction(string passwordToBeHashed, byte[] salt, int numberOfIterations)
     {
         //You can change the algorithm  used internally (By default is SH1)
         var algName = HashAlgorithmName.SHA1;
@@ -49,3 +50,24 @@ public static class PasswordHasher
     }
 }
 
+public static class Argon2idPasswordHasher
+{
+    public  static PasswordHashResult ComputeHashPassword(string passwordToBeHashed, byte[] salt, int numberOfIterations)
+    {
+        var passwordBytes = Encoding.UTF8.GetBytes(passwordToBeHashed);
+        var KnownSecret = CryptographicKey.CreateRandomOfBytes(16).Bytes;
+        var unitMemorySize = 1048576;
+        var keyLength = 16;
+
+        var argon2 = new Argon2id(passwordBytes)
+        {
+            KnownSecret = KnownSecret,
+            Salt = salt,
+            DegreeOfParallelism = Environment.ProcessorCount,
+            Iterations = numberOfIterations,
+            MemorySize = Environment.ProcessorCount * unitMemorySize,
+        };
+        var hashed = argon2.GetBytes(keyLength);
+        return new PasswordHashResult(hashed);
+    }
+}
